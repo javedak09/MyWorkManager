@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onChanged(@Nullable WorkInfo workInfo) {
                         textView.append(workInfo.getState().name() + "\n");
+
                     }
                 });
 
