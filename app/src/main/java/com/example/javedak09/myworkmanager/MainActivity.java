@@ -7,6 +7,8 @@ import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 
 import android.os.Bundle;
 import android.view.View;
@@ -17,7 +19,7 @@ import com.example.javedak09.myworkmanager.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static String MESSAGE_STATUS;
+    public static String MESSAGE_STATUS = "i m main activity message";
     ActivityMainBinding bi;
 
     @Override
@@ -26,34 +28,35 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
 
         bi = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
-
-        Data data = new Data.Builder().putString(WorkManagerSync.TASK_DESC, "The task data passed from MainActivity").build();
-
-        final OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(WorkManagerSync.class).setInputData(data).build();
-
-        findViewById(R.id.btn_Continue).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                WorkManagerSync.getInstance().enqueue(workRequest);
-            }
-        });
-
-
-        final TextView textView = findViewById(R.id.txtmsg);
-        WorkManagerSync.getInstance().getWorkInfoByIdLiveData(workRequest.getId())
-                .observe(this, new Observer<WorkInfo>() {
-                    @Override
-                    public void onChanged(@Nullable WorkInfo workInfo) {
-                        textView.append(workInfo.getState().name() + "\n");
-
-                    }
-                });
-
     }
 
     public void cmdFetchData(View view) {
         Toast.makeText(this, "I m click", Toast.LENGTH_SHORT).show();
+
+
+        final Data data = new Data.Builder().putString(MESSAGE_STATUS, "The task data passed from MainActivity").build();
+
+        final WorkManager work = WorkManager.getInstance();
+        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(WorkManagerSync.class).setInputData(data).build();
+        work.enqueue(workRequest);
+
+
+        work.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(@Nullable WorkInfo workInfo) {
+                if (workInfo != null) {
+
+                    WorkInfo.State state = workInfo.getState();
+
+                    //bi.txtmsg.append(state.toString() + "\n");
+
+                    bi.txtmsg.append(workInfo.getOutputData() + "\n");
+
+                    //bi.txtmsg.append(state.getDeclaringClass().getName() + "\n");
+                }
+            }
+        });
+
     }
 
     public void cmdFetchData1() {
