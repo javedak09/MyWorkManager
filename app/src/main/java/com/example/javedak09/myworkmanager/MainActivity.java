@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
                     WorkInfo.State state = workInfo.getState();
 
+
                     //bi.txtmsg.append(state.toString() + "\n");
 
                     bi.txtmsg.append(workInfo.getOutputData() + "\n");
